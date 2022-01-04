@@ -927,7 +927,7 @@ def motion_camera_ui_to_dict(ui, prev_config=None):
     data['movie_codec'] = ui['movie_format']
     q = int(ui['movie_quality'])
 
-    data['movie_quality'] = max(1, q)
+    data['movie_quality'] = max(0, q)
 
     # motion detection
 
@@ -992,7 +992,7 @@ def motion_camera_ui_to_dict(ui, prev_config=None):
     if ui['command_notifications_enabled']:
         on_event_start += utils.split_semicolon(ui['command_notifications_exec'])
 
-    data['on_event_start'] = '; '.join(on_event_start)
+    # data['on_event_start'] = '; '.join(on_event_start)
 
     # event end
     on_event_end = ['%(script)s stop %%t' % {'script': meyectl.find_command('relayevent')}]
@@ -1000,7 +1000,7 @@ def motion_camera_ui_to_dict(ui, prev_config=None):
     if ui['command_end_notifications_enabled']:
         on_event_end += utils.split_semicolon(ui['command_end_notifications_exec'])
 
-    data['on_event_end'] = '; '.join(on_event_end)
+    # data['on_event_end'] = '; '.join(on_event_end)
 
     # movie end
     on_movie_end = ['%(script)s movie_end %%t %%f' % {'script': meyectl.find_command('relayevent')}]
@@ -1016,7 +1016,7 @@ def motion_camera_ui_to_dict(ui, prev_config=None):
     if ui['command_storage_enabled']:
         on_movie_end += utils.split_semicolon(ui['command_storage_exec'])
 
-    data['on_movie_end'] = '; '.join(on_movie_end)
+    # data['on_movie_end'] = '; '.join(on_movie_end)
 
     # picture save
     on_picture_save = ['%(script)s picture_save %%t %%f' % {'script': meyectl.find_command('relayevent')}]
@@ -1032,7 +1032,7 @@ def motion_camera_ui_to_dict(ui, prev_config=None):
     if ui['command_storage_enabled']:
         on_picture_save += utils.split_semicolon(ui['command_storage_exec'])
 
-    data['on_picture_save'] = '; '.join(on_picture_save)
+    # data['on_picture_save'] = '; '.join(on_picture_save)
 
     # additional configs
     for name, value in ui.iteritems():
@@ -1860,7 +1860,7 @@ def _set_default_motion_camera(camera_id, data):
         data.setdefault('height', 288)
 
     data.setdefault('auto_brightness', False)
-    data.setdefault('framerate', 2)
+    data.setdefault('framerate', 20)
     data.setdefault('rotate', 0)
 
     data.setdefault('@storage_device', 'custom-path')
@@ -1885,16 +1885,18 @@ def _set_default_motion_camera(camera_id, data):
 
     data.setdefault('stream_localhost', False)
     data.setdefault('stream_port', 8080 + camera_id)
-    data.setdefault('stream_maxrate', 5)
-    data.setdefault('stream_quality', 85)
+    data.setdefault('stream_maxrate', 10)
+    data.setdefault('stream_quality', 75)
     data.setdefault('stream_motion', False)
     data.setdefault('stream_auth_method', 0)
 
     data.setdefault('@webcam_resolution', 100)
     data.setdefault('@webcam_server_resize', False)
 
-    data.setdefault('text_left', data['camera_name'])
-    data.setdefault('text_right', '%Y-%m-%d\\n%T')
+#     data.setdefault('text_left', data['camera_name'])
+    data.setdefault('text_left', '')
+#     data.setdefault('text_right', '%Y-%m-%d\\n%T')
+    data.setdefault('text_right', '%d-%m-%Y %T')
     data.setdefault('text_scale', 1)
 
     data.setdefault('@motion_detection', True)
@@ -1902,7 +1904,7 @@ def _set_default_motion_camera(camera_id, data):
     data.setdefault('locate_motion_mode', False)
     data.setdefault('locate_motion_style', 'redbox')
 
-    data.setdefault('threshold', 2000)
+    data.setdefault('threshold', 500)
     data.setdefault('threshold_maximum', 0)
     data.setdefault('threshold_tune', False)
     data.setdefault('noise_tune', True)
@@ -1921,7 +1923,7 @@ def _set_default_motion_camera(camera_id, data):
     data.setdefault('picture_output', False)
     data.setdefault('picture_filename', '')
     data.setdefault('emulate_motion', False)
-    data.setdefault('event_gap', 30)
+    data.setdefault('event_gap', 10)
 
     data.setdefault('snapshot_interval', 0)
     data.setdefault('snapshot_filename', '')
@@ -1930,20 +1932,23 @@ def _set_default_motion_camera(camera_id, data):
     data.setdefault('@manual_snapshots', True)
 
     data.setdefault('movie_filename', '%Y-%m-%d/%H-%M-%S')
-    data.setdefault('movie_max_time', 0)
+    data.setdefault('movie_max_time', 120)
     data.setdefault('movie_output', False)
     data.setdefault('movie_passthrough', False)
 
-    if motionctl.has_h264_omx_support():
-        data.setdefault('movie_codec', 'mp4:h264_omx')  # will use h264 codec
+#     if motionctl.has_h264_omx_support():
+#         data.setdefault('movie_codec', 'mp4:h264_omx')  # will use h264 codec
 
-    elif motionctl.has_h264_v4l2m2m_support():
-        data.setdefault('movie_codec', 'mp4:h264_v4l2m2m')  # will use h264 codec
+#     elif motionctl.has_h264_v4l2m2m_support():
+#         data.setdefault('movie_codec', 'mp4:h264_v4l2m2m')  # will use h264 codec
 
-    else:
-        data.setdefault('movie_codec', 'mp4')  # will use h264 codec
+#     else:
+#         data.setdefault('movie_codec', 'mp4')  # will use h264 codec
+    data.setdefault('movie_codec', 'mkv')  # will use h264 codec
 
-    data.setdefault('movie_quality', 75)  # 75%
+    # data.setdefault('movie_quality', 75)  # 75%
+    data.setdefault('movie_quality', 0)  # 75%
+    data.setdefault('ffmpeg_bps', 800000)
 
     data.setdefault('@preserve_movies', 0)
     data.setdefault('@manual_record', False)
